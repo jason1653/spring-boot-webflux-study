@@ -20,7 +20,7 @@ class BookController(
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postBook(@RequestBody bookkDto: BookDto.Post): Mono<Book> {
+    fun postBook(@RequestBody bookkDto: Mono<BookDto.Post>): Mono<Book> {
         val book: Mono<BookDto.Post> = bookService.createBook(bookkDto)
 
         val response: Mono<Book> = book.map {
@@ -41,7 +41,7 @@ class BookController(
     }
 
     @PatchMapping("/{book-id}")
-    fun patchBook(@PathVariable("book-id") bookId: Long, @RequestBody bookDto: BookDto.Patch): Mono<Book> {
+    fun patchBook(@PathVariable("book-id") bookId: Long, @RequestBody bookDto: Mono<BookDto.Patch>): Mono<Book> {
         val book: Mono<BookDto.Patch> = bookService.updateBook(bookDto)
 
         val response: Mono<Book> = book.map {

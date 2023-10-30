@@ -6,12 +6,20 @@ import java.time.LocalDateTime
 
 @Service
 class BookService {
-    fun createBook(book: BookDto.Post): Mono<BookDto.Post> {
-        return Mono.just(book)
+    fun createBook(book: Mono<BookDto.Post>): Mono<BookDto.Post> {
+        //!!!!! 종요 !!!!!!!
+        //flatMap은 Blocking I/O를 사용하지 않는다
+
+        return book.flatMap {
+            Mono.just(it)
+        }
     }
 
-    fun updateBook(book: BookDto.Patch): Mono<BookDto.Patch> {
-        return Mono.just(book)
+    fun updateBook(book: Mono<BookDto.Patch>): Mono<BookDto.Patch> {
+        //!!!!! 종요 !!!!!!!
+        //flatMap은 Blocking I/O를 사용하지 않는다
+
+        return book.flatMap { Mono.just(it) }
     }
 
     fun findBook(bookId: Long): Mono<BookDto.Response> {
