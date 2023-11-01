@@ -40,7 +40,7 @@ class BookHandler(
             .doOnNext { patch -> validator.validate(patch) }
             .flatMap { patch ->
                 patch.bookId = bookId
-                return@flatMap bookService.updateBook(patch as Book)
+                return@flatMap bookService.updateBook(patch as Book)7
             }
             .flatMap { book ->
                 ServerResponse

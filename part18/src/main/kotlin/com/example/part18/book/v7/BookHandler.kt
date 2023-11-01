@@ -1,5 +1,6 @@
-package com.example.part18.book.v5
+package com.example.part18.book.v7
 
+import com.example.part18.book.v5.BookPatchDto
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -8,10 +9,10 @@ import reactor.util.function.Tuple2
 import reactor.util.function.Tuples
 import java.net.URI
 
-@Component("BookHandlerV5")
+@Component("BookHandlerV7")
 class BookHandler(
-    private val bookService: BookService,
     private val validator: BookValidator,
+    private val bookService: BookService,
 ) {
     fun createBook(request: ServerRequest): Mono<ServerResponse> {
         return request
@@ -31,7 +32,7 @@ class BookHandler(
             }
             .flatMap { post ->
                 ServerResponse
-                    .created(URI.create("/v5/books/" + post.bookId)).build()
+                    .created(URI.create("/v7/books/" + post.bookId)).build()
             }
     }
 
@@ -62,7 +63,9 @@ class BookHandler(
     }
 
     fun getBooks(request: ServerRequest): Mono<ServerResponse> {
-        return bookService.findBooks()
+        val pageAndSize = getPageAndSize(request)
+
+        return bookService.findBooks(pageAndSize.t1, pageAndSize.t2)
             .flatMap { books ->
                 ServerResponse
                     .ok()
@@ -70,5 +73,10 @@ class BookHandler(
             }
     }
 
+    private fun getPageAndSize(request: ServerRequest): Tuple2<Int, Int> {
+        val page = request.queryParam("page").map(Integer::parseInt).orElse(0)
+        val size = request.queryParam("size").map(Integer::parseInt).orElse(0)
 
+        return Tuples.of(page, size)
+    }
 }
