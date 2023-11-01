@@ -1,12 +1,14 @@
-package com.example.part18.book.v6
+package com.example.part18.book.v8
 
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import reactor.core.publisher.Mono
+import reactor.util.function.Tuple2
+import reactor.util.function.Tuples
 import java.net.URI
 
-@Component("BookHandlerV6")
+@Component("BookHandlerV8")
 class BookHandler(
     private val bookService: BookService,
     private val validator: BookValidator,
@@ -60,11 +62,19 @@ class BookHandler(
     }
 
     fun getBooks(request: ServerRequest): Mono<ServerResponse> {
-        return bookService.findBooks()
+        val pageable = pagePageAndSize(request)
+        return bookService.findBooks(pageable.t1, pageable.t2)
             .flatMap { books ->
                 ServerResponse
                     .ok()
                     .bodyValue(books)
             }
+    }
+
+    private fun pagePageAndSize(request: ServerRequest): Tuple2<Long, Long> {
+        val page = request.queryParam("page").map(java.lang.Long::parseLong).orElse(0L)
+        val size = request.queryParam("size").map(java.lang.Long::parseLong).orElse(0L)
+
+        return Tuples.of(page, size)
     }
 }
